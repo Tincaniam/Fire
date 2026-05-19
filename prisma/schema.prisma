@@ -73,11 +73,13 @@ model InspectionReport {
   serviceType     ServiceType
   status          ReportStatus     @default(DRAFT)
   notes           String?
+  pdfUrl          String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
   deficiencies    Deficiency[]
   lineItems       InspectionItem[]
+  customerTokens  CustomerToken[]
 }
 
 enum ServiceType {
@@ -133,4 +135,15 @@ enum Severity {
   MODERATE
   HIGH
   CRITICAL
+}
+
+// ─── Customer Portal ──────────────────────────────────────────────────────────
+
+model CustomerToken {
+  id        String           @id @default(cuid())
+  token     String           @unique
+  reportId  String
+  report    InspectionReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sentTo    String
+  createdAt DateTime         @default(now())
 }

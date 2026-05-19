@@ -12,6 +12,8 @@ import {
 import DeficiencyPanel from "./DeficiencyPanel";
 import ReportActions from "./ReportActions";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReportDetailPage({
   params,
 }: {
@@ -86,7 +88,7 @@ export default async function ReportDetailPage({
               </span>
             </div>
           </div>
-          <ReportActions reportId={report.id} status={report.status} />
+          <ReportActions reportId={report.id} status={report.status} pdfUrl={report.pdfUrl} clientEmail={report.site.client.email} />
         </div>
       </div>
 

@@ -3,6 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { InspectionReportPDF } from "@/components/pdf/InspectionReportPDF";
+import { put } from "@vercel/blob";
+
+async function fetchReport(id: string) {
+  return prisma.inspectionReport.findUnique({
+    where: { id },
+    include: {
+      site: { include: { client: true } },
+      technician: true,
+      lineItems: { orderBy: { sortOrder: "asc" } },
+      deficiencies: { orderBy: { createdAt: "asc" } },
+    },
+  });
+}
 
 export async function GET(
   _req: Request,
@@ -12,17 +25,7 @@ export async function GET(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-
-  const report = await prisma.inspectionReport.findUnique({
-    where: { id },
-    include: {
-      site: { include: { client: true } },
-      technician: true,
-      lineItems: { orderBy: { sortOrder: "asc" } },
-      deficiencies: { orderBy: { createdAt: "asc" } },
-    },
-  });
-
+  const report = await fetchReport(id);
   if (!report) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const buffer = await renderToBuffer(InspectionReportPDF({ report }));
@@ -34,4 +37,31 @@ export async function GET(
       "Content-Disposition": `inline; filename="inspection-report-${id}.pdf"`,
     },
   });
+}
+
+export async function POST(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const report = await fetchReport(id);
+  if (!report) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const buffer = await renderToBuffer(InspectionReportPDF({ report }));
+
+  const blob = await put(`reports/${id}.pdf`, buffer, {
+    access: "public",
+    contentType: "application/pdf",
+    addRandomSuffix: false,
+  });
+
+  const updated = await prisma.inspectionReport.update({
+    where: { id },
+    data: { pdfUrl: blob.url },
+  });
+
+  return NextResponse.json({ url: updated.pdfUrl });
 }

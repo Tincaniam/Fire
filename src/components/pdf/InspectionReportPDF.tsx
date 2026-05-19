@@ -28,12 +28,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingBottom: 16,
     borderBottomWidth: 2,
-    borderBottomColor: "#dc2626",
+    borderBottomColor: "#5e81ac",
   },
   companyName: {
     fontSize: 18,
     fontFamily: "Helvetica-Bold",
-    color: "#dc2626",
+    color: "#5e81ac",
   },
   reportTitle: {
     fontSize: 11,
