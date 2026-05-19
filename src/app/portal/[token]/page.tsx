@@ -54,7 +54,7 @@ export default async function PortalPage({
         <div className="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-[15px] font-bold text-white tracking-tight">
-              RavenLedger
+              RavenDock
             </p>
             <p className="text-[11px] text-gray-600 mt-0.5">
               Fire &amp; Life Safety Inspections
@@ -199,7 +199,7 @@ export default async function PortalPage({
         <p className="text-[11.5px] text-gray-700 text-center">
           This report was shared with you securely by{" "}
           <span className="text-gray-600">{report.site.client.name}</span> via
-          RavenLedger. &copy; {new Date().getFullYear()} RavenLedger.
+          RavenDock. &copy; {new Date().getFullYear()} RavenDock.
         </p>
       </footer>
     </div>

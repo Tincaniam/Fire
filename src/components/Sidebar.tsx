@@ -43,7 +43,7 @@ export default function Sidebar({
           <RavenIcon className="w-[15px] h-[15px] text-white" />
         </div>
         <span className="font-semibold text-[13.5px] text-white tracking-tight">
-          RavenLedger
+          RavenDock
         </span>
       </div>
 

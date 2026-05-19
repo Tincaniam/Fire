@@ -4,7 +4,8 @@ import { auth } from "@/lib/auth";
 import { z } from "zod";
 
 const schema = z.object({
-  resolved: z.boolean(),
+  resolved: z.boolean().optional(),
+  dueDate: z.string().nullable().optional(),
 });
 
 export async function PATCH(
@@ -19,12 +20,15 @@ export async function PATCH(
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const deficiency = await prisma.deficiency.update({
-    where: { id },
-    data: {
-      resolved: parsed.data.resolved,
-      resolvedAt: parsed.data.resolved ? new Date() : null,
-    },
-  });
+  const update: Record<string, unknown> = {};
+  if (parsed.data.resolved !== undefined) {
+    update.resolved = parsed.data.resolved;
+    update.resolvedAt = parsed.data.resolved ? new Date() : null;
+  }
+  if ("dueDate" in parsed.data) {
+    update.dueDate = parsed.data.dueDate ? new Date(parsed.data.dueDate) : null;
+  }
+
+  const deficiency = await prisma.deficiency.update({ where: { id }, data: update });
   return NextResponse.json(deficiency);
 }

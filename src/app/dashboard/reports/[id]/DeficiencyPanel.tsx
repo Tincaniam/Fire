@@ -28,6 +28,7 @@ export default function DeficiencyPanel({
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState<Severity>("MODERATE");
   const [notes, setNotes] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
 
   const open = deficiencies.filter((d) => !d.resolved);
@@ -39,7 +40,7 @@ export default function DeficiencyPanel({
     const res = await fetch("/api/deficiencies", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reportId, description, severity, notes }),
+      body: JSON.stringify({ reportId, description, severity, notes, dueDate: dueDate || undefined }),
     });
     if (res.ok) {
       const def = await res.json();
@@ -47,6 +48,7 @@ export default function DeficiencyPanel({
       setDescription("");
       setNotes("");
       setSeverity("MODERATE");
+      setDueDate("");
       setShowForm(false);
       router.refresh();
     }
@@ -58,6 +60,19 @@ export default function DeficiencyPanel({
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resolved }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setDeficiencies((prev) => prev.map((d) => (d.id === id ? updated : d)));
+      router.refresh();
+    }
+  }
+
+  async function updateDueDate(id: string, dueDate: string | null) {
+    const res = await fetch(`/api/deficiencies/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dueDate }),
     });
     if (res.ok) {
       const updated = await res.json();
@@ -115,9 +130,15 @@ export default function DeficiencyPanel({
               <option value="CRITICAL">Critical</option>
             </select>
             <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="bg-gray-800/60 border border-white/[0.09] rounded-xl px-3 py-2 text-white text-[13px] focus:outline-none focus:ring-2 focus:ring-red-600/40 transition-all [color-scheme:dark]"
+            />
+            <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Additional notes (optional)"
+              placeholder="Notes (optional)"
               className="flex-1 bg-gray-800/60 border border-white/[0.09] rounded-xl px-3.5 py-2 text-white placeholder-gray-600 text-[13px] focus:outline-none focus:ring-2 focus:ring-red-600/40 transition-all"
             />
             <button
@@ -141,7 +162,7 @@ export default function DeficiencyPanel({
         <div>
           {/* Open */}
           {open.map((d) => (
-            <DeficiencyRow key={d.id} deficiency={d} onToggle={toggleResolved} />
+            <DeficiencyRow key={d.id} deficiency={d} onToggle={toggleResolved} onDueDateUpdate={updateDueDate} />
           ))}
 
           {/* Resolved section */}
@@ -153,7 +174,7 @@ export default function DeficiencyPanel({
                 </p>
               </div>
               {resolved.map((d) => (
-                <DeficiencyRow key={d.id} deficiency={d} onToggle={toggleResolved} />
+                <DeficiencyRow key={d.id} deficiency={d} onToggle={toggleResolved} onDueDateUpdate={updateDueDate} />
               ))}
             </>
           )}
@@ -166,11 +187,35 @@ export default function DeficiencyPanel({
 function DeficiencyRow({
   deficiency: d,
   onToggle,
+  onDueDateUpdate,
 }: {
   deficiency: Deficiency;
   onToggle: (id: string, resolved: boolean) => void;
+  onDueDateUpdate: (id: string, dueDate: string | null) => Promise<void>;
 }) {
   const sc = SEVERITY_CONFIG[d.severity];
+  const [editingDue, setEditingDue] = useState(false);
+  const [dueDateVal, setDueDateVal] = useState(
+    d.dueDate ? new Date(d.dueDate).toISOString().split("T")[0] : ""
+  );
+  const [saving, setSaving] = useState(false);
+
+  const now = new Date();
+  const due = d.dueDate ? new Date(d.dueDate) : null;
+  const isOverdue = due && !d.resolved && due < now;
+  const isDueSoon =
+    due &&
+    !d.resolved &&
+    !isOverdue &&
+    due.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000;
+
+  async function saveDueDate() {
+    setSaving(true);
+    await onDueDateUpdate(d.id, dueDateVal || null);
+    setSaving(false);
+    setEditingDue(false);
+  }
+
   return (
     <div
       className={`flex items-start gap-3.5 px-5 py-3.5 border-t border-white/[0.04] transition-opacity ${
@@ -199,11 +244,59 @@ function DeficiencyRow({
         {d.notes && (
           <p className="text-[11.5px] text-gray-500 mt-0.5">{d.notes}</p>
         )}
+        {/* Due date row */}
+        <div className="mt-1.5 flex items-center gap-2 flex-wrap">
+          {!editingDue && due && (
+            <button
+              onClick={() => !d.resolved && setEditingDue(true)}
+              className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full transition-colors ${
+                isOverdue
+                  ? "bg-[#bf616a]/15 text-[#bf616a] hover:bg-[#bf616a]/25"
+                  : isDueSoon
+                  ? "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                  : "bg-gray-800/60 text-gray-500 hover:bg-gray-700/60 hover:text-gray-300"
+              } ${d.resolved ? "cursor-default pointer-events-none" : "cursor-pointer"}`}
+            >
+              {isOverdue ? "⚠ Overdue · " : "Due "}
+              {due.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </button>
+          )}
+          {!editingDue && !due && !d.resolved && (
+            <button
+              onClick={() => setEditingDue(true)}
+              className="text-[11px] text-gray-700 hover:text-gray-500 transition-colors"
+            >
+              + set due date
+            </button>
+          )}
+          {editingDue && (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="date"
+                autoFocus
+                value={dueDateVal}
+                onChange={(e) => setDueDateVal(e.target.value)}
+                className="bg-gray-800 border border-white/[0.09] rounded-lg px-2 py-0.5 text-white text-[11.5px] focus:outline-none focus:ring-1 focus:ring-red-600/40 [color-scheme:dark]"
+              />
+              <button
+                onClick={saveDueDate}
+                disabled={saving}
+                className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 disabled:opacity-50 transition-colors"
+              >
+                {saving ? "…" : "Save"}
+              </button>
+              <button
+                onClick={() => { setEditingDue(false); setDueDateVal(d.dueDate ? new Date(d.dueDate).toISOString().split("T")[0] : ""); }}
+                className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <span
-        className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
-          sc.bg
-        } ${sc.text}`}
+        className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${sc.bg} ${sc.text}`}
       >
         <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
         {sc.label}

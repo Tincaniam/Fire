@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RavenLedger",
+  title: "RavenDock",
   description: "Inspection records and deficiency tracking for inspection contractors.",
 };
 

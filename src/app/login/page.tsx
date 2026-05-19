@@ -60,7 +60,7 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-[22px] font-bold text-white tracking-tight">
-            RavenLedger
+            RavenDock
           </h1>
           <p className="text-gray-500 text-[13px] mt-1">
             Compliance reporting, simplified.
@@ -129,7 +129,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-[11px] text-gray-700 mt-6">
-          © {new Date().getFullYear()} RavenLedger · All rights reserved
+          © {new Date().getFullYear()} RavenDock · All rights reserved
         </p>
       </div>
     </div>

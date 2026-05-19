@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Plus,
   ArrowRight,
+  Clock,
 } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -23,11 +24,21 @@ export default async function DashboardPage() {
       prisma.deficiency.count({ where: { resolved: false } }),
     ]);
 
-  const recentReports = await prisma.inspectionReport.findMany({
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    include: { site: { include: { client: true } }, technician: true },
-  });
+  const [recentReports, dueDateDeficiencies] = await Promise.all([
+    prisma.inspectionReport.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { site: { include: { client: true } }, technician: true },
+    }),
+    prisma.deficiency.findMany({
+      where: { resolved: false, dueDate: { not: null } },
+      orderBy: { dueDate: "asc" },
+      take: 8,
+      include: {
+        report: { include: { site: { include: { client: true } } } },
+      },
+    }),
+  ]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 py-1">
@@ -90,6 +101,63 @@ export default async function DashboardPage() {
           warn={openDeficiencies > 0}
         />
       </div>
+
+      {/* Due Dates widget */}
+      {dueDateDeficiencies.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-3.5 h-3.5 text-gray-600" />
+            <h2 className="text-[11px] font-semibold text-gray-600 uppercase tracking-widest">
+              Deficiency Due Dates
+            </h2>
+          </div>
+          <div className="bg-gray-900/50 border border-white/[0.07] rounded-xl overflow-hidden">
+            <div className="divide-y divide-white/[0.04]">
+              {dueDateDeficiencies.map((d) => {
+                const due = new Date(d.dueDate!);
+                const now = new Date();
+                const isOverdue = due < now;
+                const isDueSoon =
+                  !isOverdue &&
+                  due.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000;
+                return (
+                  <Link
+                    key={d.id}
+                    href={`/dashboard/reports/${d.report.id}`}
+                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-white/[0.02] transition-colors group"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-white truncate group-hover:text-red-400 transition-colors">
+                        {d.description}
+                      </p>
+                      <p className="text-[11.5px] text-gray-500 mt-0.5">
+                        {d.report.site.client.name} · {d.report.site.name}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 text-[11.5px] font-medium px-2.5 py-0.5 rounded-full ${
+                        isOverdue
+                          ? "bg-[#bf616a]/15 text-[#bf616a]"
+                          : isDueSoon
+                          ? "bg-amber-500/10 text-amber-400"
+                          : "bg-gray-800/60 text-gray-500"
+                      }`}
+                    >
+                      {isOverdue ? "⚠ " : ""}
+                      {due.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <SeverityDot severity={d.severity} />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Recent reports */}
       <div>
@@ -242,3 +310,17 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function SeverityDot({ severity }: { severity: string }) {
+  const colors: Record<string, string> = {
+    LOW: "bg-gray-500",
+    MODERATE: "bg-yellow-500",
+    HIGH: "bg-orange-500",
+    CRITICAL: "bg-[#bf616a]",
+  };
+  return (
+    <span
+      className={`shrink-0 w-2 h-2 rounded-full ${colors[severity] ?? "bg-gray-500"}`}
+      title={severity}
+    />
+  );
+}

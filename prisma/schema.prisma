@@ -125,6 +125,7 @@ model Deficiency {
   severity    Severity         @default(MODERATE)
   resolved    Boolean          @default(false)
   resolvedAt  DateTime?
+  dueDate     DateTime?
   notes       String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt

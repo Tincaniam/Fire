@@ -6,13 +6,15 @@ export const runtime = "nodejs";
 
 export default auth((req: NextRequest & { auth: unknown }) => {
   const isLoggedIn = !!req.auth;
-  const isLoginPage = req.nextUrl.pathname === "/login";
+  const pathname = req.nextUrl.pathname;
+  const isLoginPage = pathname === "/login";
+  const isLandingPage = pathname === "/";
 
-  if (!isLoggedIn && !isLoginPage) {
+  if (!isLoggedIn && !isLoginPage && !isLandingPage) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (isLoggedIn && isLoginPage) {
+  if (isLoggedIn && (isLoginPage || isLandingPage)) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 });

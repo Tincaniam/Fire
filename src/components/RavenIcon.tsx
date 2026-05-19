@@ -1,7 +1,7 @@
 /**
  * RavenIcon — hand-crafted SVG raven in profile (24 × 24 viewBox).
  * Facing right, perched. Eye is punched out via evenodd fill rule.
- * Designed to match the Nord maritime RavenLedger brand.
+ * Designed to match the Nord maritime RavenDock brand.
  */
 export default function RavenIcon({ className }: { className?: string }) {
   return (

@@ -60,7 +60,7 @@ export async function POST(
       day: "numeric",
     });
     const fromAddress =
-      process.env.RESEND_FROM_EMAIL ?? "noreply@ravenledger.com";
+      process.env.RESEND_FROM_EMAIL ?? "noreply@ravendock.com";
 
     await resend.emails.send({
       from: fromAddress,
@@ -96,7 +96,7 @@ function buildEmailHtml(opts: {
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;">
   <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1);">
     <div style="background:#2e3440;padding:28px 32px;">
-      <p style="margin:0;font-size:20px;font-weight:700;color:#eceff4;letter-spacing:-0.3px;">RavenLedger</p>
+      <p style="margin:0;font-size:20px;font-weight:700;color:#eceff4;letter-spacing:-0.3px;">RavenDock</p>
       <p style="margin:4px 0 0;font-size:13px;color:#81a1c1;">Fire &amp; Life Safety Inspections</p>
     </div>
     <div style="padding:32px;">
@@ -116,7 +116,7 @@ function buildEmailHtml(opts: {
       </p>
     </div>
     <div style="padding:20px 32px;border-top:1px solid #f3f4f6;background:#fafafa;">
-      <p style="margin:0;font-size:12px;color:#9ca3af;">© RavenLedger. This link is unique to you — please do not share it.</p>
+      <p style="margin:0;font-size:12px;color:#9ca3af;">© RavenDock. This link is unique to you — please do not share it.</p>
     </div>
   </div>
 </body>
