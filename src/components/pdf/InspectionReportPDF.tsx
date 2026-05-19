@@ -173,7 +173,7 @@ export function InspectionReportPDF({ report }: { report: ReportWithRelations })
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>FireExtenguisher</Text>
+            <Text style={styles.companyName}>RavenLedger</Text>
             <Text style={styles.reportTitle}>Inspection Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
@@ -306,7 +306,7 @@ export function InspectionReportPDF({ report }: { report: ReportWithRelations })
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>FireExtenguisher · Inspection Report</Text>
+          <Text style={styles.footerText}>RavenLedger · Inspection Report</Text>
           <Text
             style={styles.footerText}
             render={({ pageNumber, totalPages }) =>

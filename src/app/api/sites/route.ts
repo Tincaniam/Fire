@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const schema = z.object({
@@ -22,5 +23,6 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const site = await prisma.site.create({ data: parsed.data });
+  revalidatePath(`/dashboard/clients/${parsed.data.clientId}`);
   return NextResponse.json(site, { status: 201 });
 }

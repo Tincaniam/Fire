@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { FileDown, CheckCheck, Send } from "lucide-react";
+import { FileDown, CheckCheck, Send, Pencil } from "lucide-react";
 
 export default function ReportActions({
   reportId,
@@ -27,24 +27,34 @@ export default function ReportActions({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 shrink-0">
       <Link
         href={`/api/reports/${reportId}/pdf`}
         target="_blank"
-        className="flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 border border-white/[0.08] text-white text-[12.5px] font-medium px-3.5 py-2 rounded-lg transition-all"
       >
-        <FileDown className="w-4 h-4" />
+        <FileDown className="w-3.5 h-3.5" />
         Export PDF
       </Link>
+
+      {status === "DRAFT" && (
+        <Link
+          href={`/dashboard/reports/${reportId}/edit`}
+          className="flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 border border-white/[0.08] text-white text-[12.5px] font-medium px-3.5 py-2 rounded-lg transition-all"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          Edit Draft
+        </Link>
+      )}
 
       {status === "DRAFT" && (
         <button
           onClick={() => updateStatus("COMPLETE")}
           disabled={loading === "COMPLETE"}
-          className="flex items-center gap-1.5 bg-green-700 hover:bg-green-600 disabled:opacity-60 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-[12.5px] font-medium px-3.5 py-2 rounded-lg transition-all shadow-[0_1px_8px_rgba(16,185,129,0.2)]"
         >
-          <CheckCheck className="w-4 h-4" />
-          {loading === "COMPLETE" ? "…" : "Mark Complete"}
+          <CheckCheck className="w-3.5 h-3.5" />
+          {loading === "COMPLETE" ? "Saving…" : "Mark Complete"}
         </button>
       )}
 
@@ -52,10 +62,10 @@ export default function ReportActions({
         <button
           onClick={() => updateStatus("SUBMITTED")}
           disabled={loading === "SUBMITTED"}
-          className="flex items-center gap-1.5 bg-blue-700 hover:bg-blue-600 disabled:opacity-60 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-[12.5px] font-medium px-3.5 py-2 rounded-lg transition-all shadow-[0_1px_8px_rgba(59,130,246,0.2)]"
         >
-          <Send className="w-4 h-4" />
-          {loading === "SUBMITTED" ? "…" : "Mark Submitted"}
+          <Send className="w-3.5 h-3.5" />
+          {loading === "SUBMITTED" ? "Saving…" : "Mark Submitted"}
         </button>
       )}
     </div>

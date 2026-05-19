@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Flame } from "lucide-react";
+import RavenIcon from "@/components/RavenIcon";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -43,67 +43,96 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background:
+          "radial-gradient(ellipse 90% 65% at 50% -10%, rgba(94,129,172,0.18) 0%, transparent 60%), #1e2430",
+      }}
+    >
+      <div className="w-full max-w-[360px]">
+        {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-red-600 p-3 rounded-xl mb-3">
-            <Flame className="w-8 h-8 text-white" />
+          <div className="relative mb-4">
+            <div className="absolute inset-0 bg-red-500 rounded-2xl blur-xl opacity-25" />
+            <div className="relative bg-red-600 p-3.5 rounded-2xl shadow-lg shadow-red-900/30">
+              <RavenIcon className="w-7 h-7 text-white" />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-white">FireExtenguisher</h1>
-          <p className="text-gray-400 text-sm mt-1">Inspection reporting, simplified.</p>
+          <h1 className="text-[22px] font-bold text-white tracking-tight">
+            RavenLedger
+          </h1>
+          <p className="text-gray-500 text-[13px] mt-1">
+            Compliance reporting, simplified.
+          </p>
         </div>
 
         {/* Card */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5"
+          className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-2xl p-7 space-y-5 shadow-2xl"
         >
-          <h2 className="text-lg font-semibold text-white">Sign in</h2>
+          <div>
+            <h2 className="text-[17px] font-semibold text-white">Sign in</h2>
+            <p className="text-[12.5px] text-gray-500 mt-0.5">
+              Access your inspection dashboard
+            </p>
+          </div>
 
           {error && (
-            <div className="text-sm text-red-400 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
+            <div className="text-[12.5px] text-red-400 bg-red-950/40 border border-red-800/40 rounded-xl px-3.5 py-2.5">
               {error}
             </div>
           )}
 
-          <div className="space-y-1">
-            <label className="text-sm text-gray-300">Email</label>
-            <input
-              type="email"
-              autoComplete="email"
-              {...register("email")}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-              placeholder="you@example.com"
-            />
-            {errors.email && (
-              <p className="text-xs text-red-400">{errors.email.message}</p>
-            )}
-          </div>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-[12px] font-medium text-gray-400">
+                Email address
+              </label>
+              <input
+                type="email"
+                autoComplete="email"
+                {...register("email")}
+                className="w-full bg-white/[0.05] border border-white/[0.09] rounded-xl px-3.5 py-2.5 text-white placeholder-gray-600 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-red-600/50 focus:border-red-600/30 transition-all"
+                placeholder="you@company.com"
+              />
+              {errors.email && (
+                <p className="text-[11.5px] text-red-400">{errors.email.message}</p>
+              )}
+            </div>
 
-          <div className="space-y-1">
-            <label className="text-sm text-gray-300">Password</label>
-            <input
-              type="password"
-              autoComplete="current-password"
-              {...register("password")}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-              placeholder="••••••••"
-            />
-            {errors.password && (
-              <p className="text-xs text-red-400">{errors.password.message}</p>
-            )}
+            <div className="space-y-1.5">
+              <label className="text-[12px] font-medium text-gray-400">
+                Password
+              </label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                {...register("password")}
+                className="w-full bg-white/[0.05] border border-white/[0.09] rounded-xl px-3.5 py-2.5 text-white placeholder-gray-600 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-red-600/50 focus:border-red-600/30 transition-all"
+                placeholder="••••••••"
+              />
+              {errors.password && (
+                <p className="text-[11.5px] text-red-400">{errors.password.message}</p>
+              )}
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white font-semibold rounded-lg py-2 text-sm transition-colors"
+            className="w-full bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-2.5 text-[13.5px] transition-all shadow-[0_1px_12px_rgba(94,129,172,0.25)] hover:shadow-[0_1px_20px_rgba(94,129,172,0.35)] mt-1"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <p className="text-center text-[11px] text-gray-700 mt-6">
+          © {new Date().getFullYear()} RavenLedger · All rights reserved
+        </p>
       </div>
     </div>
   );
 }
+
