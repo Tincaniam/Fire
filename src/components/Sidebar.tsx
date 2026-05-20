@@ -40,14 +40,17 @@ export default function Sidebar({
   user,
   branding,
   role,
+  companyId,
 }: {
   user: { name?: string | null; email?: string | null };
   branding?: Branding;
   role?: string;
+  companyId?: string | null;
 }) {
   const pathname = usePathname();
   const primary = branding?.primaryColor ?? "#5e81ac";
   const isSuperAdmin = role === "SUPER_ADMIN";
+  const isCompanyAdmin = role === "COMPANY_ADMIN";
 
   return (
     <aside className="w-[220px] shrink-0 bg-[#2e3440] border-r border-white/[0.05] flex flex-col">
@@ -129,6 +132,33 @@ export default function Sidebar({
                 )}
               />
               Companies
+            </Link>
+          </>
+        )}
+
+        {isCompanyAdmin && companyId && (
+          <>
+            <p className="px-2.5 pt-4 pb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-600">
+              Admin
+            </p>
+            <Link
+              href={`/dashboard/admin/companies/${companyId}`}
+              className={cn(
+                "flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150",
+                pathname.startsWith("/dashboard/admin")
+                  ? "bg-[var(--brand-active-bg)] text-[var(--brand-active-text)] border border-[var(--brand-active-border)]"
+                  : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200 border border-transparent"
+              )}
+            >
+              <Shield
+                className={cn(
+                  "w-[15px] h-[15px] shrink-0",
+                  pathname.startsWith("/dashboard/admin")
+                    ? "text-[var(--brand-active-text)]"
+                    : "text-gray-500"
+                )}
+              />
+              Team & Settings
             </Link>
           </>
         )}

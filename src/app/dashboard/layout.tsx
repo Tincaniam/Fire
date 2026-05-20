@@ -42,6 +42,7 @@ export default async function DashboardLayout({
           logoUrl: user.logoUrl,
         }}
         role={user.role}
+        companyId={user.companyId}
       />
       <main className="flex-1 overflow-y-auto p-6">{children}</main>
     </div>
