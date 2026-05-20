@@ -44,13 +44,6 @@ export async function POST(
   if (!isSuperAdmin(user) && user.companyId !== id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  // Company admins can only create technicians
-  if (user.role === "COMPANY_ADMIN") {
-    const body = await req.json();
-    if (body.role && body.role !== "TECHNICIAN") {
-      return NextResponse.json({ error: "Company admins can only create technicians" }, { status: 403 });
-    }
-  }
 
   const body = await req.json();
   const parsed = schema.safeParse(body);

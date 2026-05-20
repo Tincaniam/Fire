@@ -326,7 +326,7 @@ export default function CompanyEditForm({
               className="bg-gray-900/60 border border-white/[0.08] text-white text-[13px] px-3 py-2 rounded-lg outline-none focus:border-white/20"
             >
               <option value="TECHNICIAN">Technician</option>
-              {isSuperAdmin && <option value="COMPANY_ADMIN">Company Admin</option>}
+              <option value="COMPANY_ADMIN">Admin</option>
             </select>
           </div>
           <button
