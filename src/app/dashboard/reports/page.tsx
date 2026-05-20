@@ -1,9 +1,21 @@
 import { prisma } from "@/lib/prisma";
+import { getSessionUser, isSuperAdmin } from "@/lib/session";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus, ClipboardList, ArrowRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReportsPage() {
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
+
+  const companyWhere = isSuperAdmin(user)
+    ? undefined
+    : { site: { client: { companyId: user.companyId! } } };
+
   const reports = await prisma.inspectionReport.findMany({
+    where: companyWhere,
     orderBy: { inspectionDate: "desc" },
     include: {
       site: { include: { client: true } },

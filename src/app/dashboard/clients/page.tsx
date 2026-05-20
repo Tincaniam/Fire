@@ -1,8 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import { getSessionUser, isSuperAdmin } from "@/lib/session";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus, Building2, MapPin, ChevronRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function ClientsPage() {
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
+
+  const where = isSuperAdmin(user) ? {} : { companyId: user.companyId! };
   const clients = await prisma.client.findMany({
     orderBy: { name: "asc" },
     include: { _count: { select: { sites: true } } },

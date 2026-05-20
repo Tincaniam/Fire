@@ -69,7 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     session({ session, token }) {
       session.user.id = token.id as string;
-      const u = session.user as Record<string, unknown>;
+      const u = session.user as unknown as Record<string, unknown>;
       u.role = token.role;
       u.companyId = token.companyId;
       u.companyName = token.companyName;
