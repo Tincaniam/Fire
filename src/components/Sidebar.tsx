@@ -39,8 +39,8 @@ export default function Sidebar({
     <aside className="w-[220px] shrink-0 bg-[#2e3440] border-r border-white/[0.05] flex flex-col">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 h-[56px] border-b border-white/[0.05] shrink-0">
-        <div className="relative flex items-center justify-center w-7 h-7 rounded-lg bg-red-600 shadow-[0_0_14px_rgba(94,129,172,0.5)]">
-          <RavenIcon className="w-[15px] h-[15px] text-white" />
+        <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-red-600 shadow-[0_0_14px_rgba(94,129,172,0.5)] overflow-hidden">
+          <RavenIcon className="w-[46px] h-[46px] text-white" />
         </div>
         <span className="font-semibold text-[13.5px] text-white tracking-tight">
           RavenDock
