@@ -163,17 +163,35 @@ const severityStyle = (s: string): Style => {
   return (map[s] ?? styles.moderate) as Style;
 };
 
-export function InspectionReportPDF({ report }: { report: ReportWithRelations }) {
+export function InspectionReportPDF({
+  report,
+  companyName = "RavenDock",
+  primaryColor = "#5e81ac",
+}: {
+  report: ReportWithRelations;
+  companyName?: string;
+  primaryColor?: string;
+}) {
   const openDefs = report.deficiencies.filter((d) => !d.resolved);
   const resolvedDefs = report.deficiencies.filter((d) => d.resolved);
+
+  // Dynamic header styles based on company branding
+  const brandedHeader = {
+    ...styles.header,
+    borderBottomColor: primaryColor,
+  };
+  const brandedCompanyName = {
+    ...styles.companyName,
+    color: primaryColor,
+  };
 
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={brandedHeader}>
           <View>
-            <Text style={styles.companyName}>RavenDock</Text>
+            <Text style={brandedCompanyName}>{companyName}</Text>
             <Text style={styles.reportTitle}>Inspection Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
@@ -306,7 +324,7 @@ export function InspectionReportPDF({ report }: { report: ReportWithRelations })
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>RavenDock · Inspection Report</Text>
+          <Text style={styles.footerText}>{companyName} · Inspection Report</Text>
           <Text
             style={styles.footerText}
             render={({ pageNumber, totalPages }) =>

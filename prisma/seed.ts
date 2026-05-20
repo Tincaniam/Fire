@@ -5,7 +5,7 @@ import "dotenv/config";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
+  // Create super admin user (no company — manages everything)
   const passwordHash = await hash("admin1234", 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@ravendock.co" },
@@ -14,11 +14,23 @@ async function main() {
       email: "admin@ravendock.co",
       name: "Matt Tinnel",
       passwordHash,
-      role: "ADMIN",
+      role: "SUPER_ADMIN",
     },
   });
 
-  // Create a sample client
+  // Create a sample company
+  const company = await prisma.company.upsert({
+    where: { id: "seed-company-1" },
+    update: {},
+    create: {
+      id: "seed-company-1",
+      name: "Acme Fire Protection",
+      primaryColor: "#5e81ac",
+      accentColor: "#88c0d0",
+    },
+  });
+
+  // Create a sample client belonging to the company
   const client = await prisma.client.upsert({
     where: { id: "seed-client-1" },
     update: {},
@@ -29,6 +41,7 @@ async function main() {
       email: "sarah@acmerestaurants.com",
       phone: "503-555-0100",
       address: "100 SW 5th Ave, Portland OR 97204",
+      companyId: company.id,
     },
   });
 
@@ -48,9 +61,11 @@ async function main() {
   });
 
   console.log("✅ Seeded:");
-  console.log(`   Admin: admin@fireextenguisher.com / admin1234`);
+  console.log(`   Super Admin: admin@ravendock.co / admin1234`);
+  console.log(`   Company: ${company.name}`);
   console.log(`   Client: ${client.name}`);
   console.log(`   Site: ${site.name}`);
+  void admin;
 }
 
 main()
