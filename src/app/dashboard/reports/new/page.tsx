@@ -1,24 +1,35 @@
 import { prisma } from "@/lib/prisma";
 import NewReportForm from "./NewReportForm";
-import { auth } from "@/lib/auth";
+import { getSessionUser, isSuperAdmin } from "@/lib/session";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export default async function NewReportPage({
   searchParams,
 }: {
   searchParams: Promise<{ siteId?: string }>;
 }) {
-  const session = await auth();
-  if (!session) redirect("/login");
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
 
   const { siteId } = await searchParams;
 
+  const siteWhere = isSuperAdmin(user)
+    ? {}
+    : { client: { companyId: user.companyId! } };
+
+  const userWhere = isSuperAdmin(user)
+    ? {}
+    : { companyId: user.companyId! };
+
   const [sites, users] = await Promise.all([
     prisma.site.findMany({
+      where: siteWhere,
       orderBy: { name: "asc" },
       include: { client: true },
     }),
-    prisma.user.findMany({ orderBy: { name: "asc" } }),
+    prisma.user.findMany({ where: userWhere, orderBy: { name: "asc" } }),
   ]);
 
   return (
@@ -31,7 +42,7 @@ export default async function NewReportPage({
           clientName: s.client.name,
         }))}
         users={users.map((u) => ({ id: u.id, name: u.name ?? u.email }))}
-        currentUserId={session.user?.id ?? ""}
+        currentUserId={user.id}
         defaultSiteId={siteId}
       />
     </div>
